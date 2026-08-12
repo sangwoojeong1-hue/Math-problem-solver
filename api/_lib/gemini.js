@@ -1,7 +1,7 @@
 // api/_lib/gemini.js
 // solve.js와 report.js가 공통으로 사용하는 Gemini 호출 로직.
 
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
 const GEMINI_ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/interactions';
 
 // 학년별로 참고할 교육과정 힌트 (모델이 눈높이에 맞는 설명을 하도록 돕는 용도)
