@@ -175,12 +175,42 @@
     return div.innerHTML;
   }
 
+  // 마크다운 변환기(marked.js)는 "\(" 같은 백슬래시를 이스케이프 문자로 해석해서
+  // MathJax 수식 구분 기호(\( \), \[ \])의 백슬래시를 지워버린다.
+  // 그래서 마크다운을 돌리기 전에 수식 구간을 통째로 플레이스홀더로 치환해뒀다가,
+  // 마크다운 변환이 끝난 뒤 원래 수식 텍스트로 되돌려놓는다.
+  function protectMath(text) {
+    const store = [];
+    const stash = (match) => {
+      store.push(match);
+      return `@@MATH${store.length - 1}@@`;
+    };
+    return {
+      protectedText: text
+        .replace(/\\\[[\s\S]*?\\\]/g, stash) // \[ ... \] (display math)
+        .replace(/\\\([\s\S]*?\\\)/g, stash), // \( ... \) (inline math)
+      store,
+    };
+  }
+
+  function restoreMath(html, store) {
+    return html.replace(/@@MATH(\d+)@@/g, (_, idx) => {
+      const original = store[Number(idx)];
+      return original ? escapeHtml(original) : '';
+    });
+  }
+
   async function renderResult(text) {
     state.lastSolutionText = text;
 
     let html;
     try {
-      html = window.marked ? window.marked.parse(text) : `<p>${escapeHtml(text)}</p>`;
+      if (window.marked) {
+        const { protectedText, store } = protectMath(text);
+        html = restoreMath(window.marked.parse(protectedText), store);
+      } else {
+        html = `<p>${escapeHtml(text)}</p>`;
+      }
     } catch (_) {
       html = `<p>${escapeHtml(text)}</p>`;
     }
