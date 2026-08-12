@@ -99,22 +99,22 @@
     });
   });
 
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files && fileInput.files[0];
+  const ALLOWED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
+
+  // 파일 선택(클릭)과 화면 캡처 붙여넣기(Ctrl+V) 둘 다 여기로 모여서
+  // 같은 검증/미리보기 로직을 공유한다.
+  function processFile(file) {
     if (!file) return;
 
     clearError();
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/heic', 'image/heif', 'application/pdf'];
-    if (!allowedTypes.includes(file.type)) {
+    if (!ALLOWED_FILE_TYPES.includes(file.type)) {
       showError('지원하지 않는 파일 형식이에요. 이미지(JPG, PNG, WEBP) 또는 PDF 파일을 올려주세요.');
-      fileInput.value = '';
       return;
     }
 
     if (file.size > MAX_BYTES) {
       showError('파일 용량이 너무 커요. 8MB 이하의 파일로 다시 시도해주세요.');
-      fileInput.value = '';
       return;
     }
 
@@ -147,6 +147,35 @@
       showError('파일을 읽는 중 문제가 발생했어요. 다시 시도해주세요.');
     };
     reader.readAsDataURL(file);
+  }
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    processFile(file);
+    // 같은 파일을 다시 선택해도 change 이벤트가 발생하도록 초기화
+    fileInput.value = '';
+  });
+
+  // 화면 캡처(스크린샷)를 복사한 뒤 Ctrl+V(Mac: Cmd+V)로 바로 붙여넣기.
+  // 포커스가 어디에 있든 동작하도록 document 전체에서 감지한다.
+  document.addEventListener('paste', (e) => {
+    const items = e.clipboardData && e.clipboardData.items;
+    if (!items) return;
+
+    for (const item of items) {
+      if (item.kind === 'file' && item.type && item.type.startsWith('image/')) {
+        const file = item.getAsFile();
+        if (file) {
+          e.preventDefault();
+          // 클립보드 이미지는 파일명이 없는 경우가 많아 보기 좋은 이름을 붙여준다.
+          const renamed = new File([file], `붙여넣은-이미지.${(file.type.split('/')[1] || 'png')}`, {
+            type: file.type,
+          });
+          processFile(renamed);
+        }
+        break;
+      }
+    }
   });
 
   btnRemoveFile.addEventListener('click', (e) => {
