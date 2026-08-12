@@ -375,6 +375,31 @@ html[data-theme='dark'] .theme-toggle .icon-sun {
   font-size: 12.5px;
 }
 
+.dropzone-hint-paste {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: var(--primary);
+}
+
+.dropzone-hint-paste svg {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.dropzone-hint-paste strong {
+  font-weight: 700;
+}
+
+@media (max-width: 420px) {
+  .dropzone-hint-paste {
+    text-align: left;
+  }
+}
+
 .preview-media {
   display: flex;
   flex-direction: column;
