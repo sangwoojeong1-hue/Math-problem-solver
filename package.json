@@ -1,0 +1,12 @@
+{
+  "name": "ai-math-helper",
+  "version": "1.0.0",
+  "private": true,
+  "description": "중학생을 위한 AI 수학 문제 풀이 도우미 (Gemini API 기반)",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.34.3"
+  }
+}

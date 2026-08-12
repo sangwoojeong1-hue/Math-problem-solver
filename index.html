@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<title>AI 수학 도우미 | 중학생 문제 풀이</title>
+
+<!-- 다크모드 깜빡임(FOUC) 방지: 스타일시트가 적용되기 전에 테마 속성부터 확정 -->
+<script>
+  (function () {
+    try {
+      var saved = localStorage.getItem('mathHelperTheme');
+      var theme = saved === 'light' || saved === 'dark'
+        ? saved
+        : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    } catch (e) {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  })();
+</script>
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
+<!-- Pretendard: 한국어 UI에 최적화된 무료 오픈소스 폰트 (토스 등 다수 서비스가 사용) -->
+<link rel="stylesheet" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<link rel="stylesheet" href="style.css" />
+
+<!-- 수식 렌더링(MathJax) -->
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']],
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+    },
+  };
+</script>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js"></script>
+<!-- 마크다운(##, ** 등) -> HTML 변환 -->
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span class="brand-badge" aria-hidden="true">Σ</span>
+          <span class="brand-name">AI 수학 도우미</span>
+        </div>
+        <button type="button" id="theme-toggle" class="theme-toggle" aria-label="화면 테마 전환">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="4" />
+            <path d="M12 2v2.4M12 19.6V22M4.4 4.4l1.7 1.7M17.9 17.9l1.7 1.7M2 12h2.4M19.6 12H22M4.4 19.6l1.7-1.7M17.9 6.1l1.7-1.7" />
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
+            <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <h1>모르는 수학 문제,<br />AI 선생님에게 물어보세요</h1>
+        <p class="hero-sub">학년을 고르고 문제 사진이나 PDF를 올리면 풀이 과정과 정답을 알려드려요.</p>
+      </section>
+
+      <div class="card">
+        <!-- 1. 학년 선택 -->
+        <section class="step" id="step-grade">
+          <div class="step-head">
+            <span class="step-index" id="step-index-1">1</span>
+            <h2>학년을 선택하세요</h2>
+          </div>
+          <div class="grade-buttons" role="group" aria-label="학년 선택">
+            <button type="button" class="grade-btn" data-grade="1">중학교<br />1학년</button>
+            <button type="button" class="grade-btn" data-grade="2">중학교<br />2학년</button>
+            <button type="button" class="grade-btn" data-grade="3">중학교<br />3학년</button>
+          </div>
+        </section>
+
+        <div class="step-divider" aria-hidden="true"></div>
+
+        <!-- 2. 문제 업로드 -->
+        <section class="step" id="step-upload">
+          <div class="step-head">
+            <span class="step-index" id="step-index-2">2</span>
+            <h2>문제를 업로드하세요</h2>
+          </div>
+          <label id="dropzone" for="file-input" class="dropzone">
+            <div class="dropzone-content" id="dropzone-empty">
+              <span class="dropzone-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 8a2 2 0 0 1 2-2h1.6l1.1-1.5A2 2 0 0 1 10.3 4h3.4a2 2 0 0 1 1.6.8L16.4 6H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" />
+                  <circle cx="12" cy="13" r="3.3" />
+                </svg>
+              </span>
+              <p class="dropzone-title">사진 찍기 또는 파일 선택</p>
+              <p class="dropzone-hint">이미지(JPG, PNG) 또는 PDF 파일 · 최대 8MB</p>
+            </div>
+            <div class="dropzone-content" id="dropzone-preview" hidden>
+              <div class="preview-media">
+                <img id="preview-image" alt="업로드한 문제 미리보기" hidden />
+                <div id="preview-pdf" class="preview-pdf" hidden>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M7 3h6.5L18 7.5V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+                    <path d="M13.5 3v4a1 1 0 0 0 1 1H18" />
+                    <path d="M9 13.2h6M9 16.4h6" />
+                  </svg>
+                  <p id="preview-filename"></p>
+                </div>
+                <button type="button" id="btn-remove-file" class="chip-remove" aria-label="다른 파일 선택하기">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M6 6l12 12M18 6L6 18" />
+                  </svg>
+                  <span>다른 파일 선택하기</span>
+                </button>
+              </div>
+            </div>
+          </label>
+          <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" capture="environment" hidden />
+        </section>
+
+        <!-- 3. 실행 -->
+        <section class="step step-submit">
+          <button type="button" id="btn-solve" class="primary-btn" disabled>
+            <span id="btn-solve-label">AI에게 풀이 물어보기</span>
+          </button>
+          <p id="error-message" class="error-message" hidden></p>
+        </section>
+
+        <!-- 로딩 -->
+        <section id="loading" class="loading" hidden>
+          <div class="loading-bar"><div class="loading-bar-fill"></div></div>
+          <p>AI 선생님이 문제를 분석하고 있어요&hellip; (최대 30초 정도 걸릴 수 있어요)</p>
+        </section>
+
+        <!-- 결과 -->
+        <section id="result-section" class="result-section" hidden>
+          <div class="result-head">
+            <span class="result-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3z" />
+                <path d="M13.5 6.5l3 3" />
+              </svg>
+            </span>
+            <h2>풀이 결과</h2>
+          </div>
+          <p id="revised-banner" class="revised-banner" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M4 4v6h6" /><path d="M20 20v-6h-6" />
+              <path d="M5.5 9a7 7 0 0 1 12.2-3.2M18.5 15a7 7 0 0 1-12.2 3.2" />
+            </svg>
+            <span>신고해주신 내용을 반영해서 AI가 다시 확인한 풀이예요.</span>
+          </p>
+          <div id="result-content" class="result-content"></div>
+
+          <!-- 오답 신고 -->
+          <div id="report-block" class="report-block">
+            <button type="button" id="btn-report-toggle" class="report-toggle">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M6 3v18" /><path d="M6 4h11l-2 3.5L17 11H6" />
+              </svg>
+              <span>이 풀이가 틀린 것 같아요</span>
+            </button>
+            <div id="report-form" class="report-form" hidden>
+              <label for="report-comment" class="report-label">어디가 이상한지 알려주시면 AI가 다시 확인해볼게요 (선택 입력)</label>
+              <textarea id="report-comment" class="report-textarea" maxlength="500" rows="3" placeholder="예: 3번째 줄 계산이 이상해요 / 정답이 답지랑 달라요"></textarea>
+              <div class="report-actions">
+                <button type="button" id="btn-report-cancel" class="text-btn">취소</button>
+                <button type="button" id="btn-report-submit" class="primary-btn small-btn">신고하고 다시 풀이 요청</button>
+              </div>
+            </div>
+            <p id="report-status" class="report-status" hidden></p>
+          </div>
+
+          <button type="button" id="btn-reset" class="secondary-btn">다른 문제 풀어보기</button>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>업로드한 문제 사진/PDF는 풀이를 위해서만 AI(Gemini)로 전송되며 별도로 저장되지 않습니다. &ldquo;이 풀이가 틀린 것 같아요&rdquo;로 신고할 경우, 남겨주신 코멘트와 AI의 풀이 텍스트(사진 제외)만 검토를 위해 저장될 수 있습니다. 인물 사진이나 개인정보가 함께 찍히지 않도록 주의해주세요.</p>
+    </footer>
+  </div>
+
+  <script defer src="script.js"></script>
+</body>
+</html>
