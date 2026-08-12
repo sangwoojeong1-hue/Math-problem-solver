@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
 <meta name="color-scheme" content="light dark" />
 <title>AI 수학 도우미 | 중학생 문제 풀이</title>
-
+ 
 <!-- 다크모드 깜빡임(FOUC) 방지: 스타일시트가 적용되기 전에 테마 속성부터 확정 -->
 <script>
   (function () {
@@ -20,13 +20,13 @@
     }
   })();
 </script>
-
+ 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin />
 <!-- Pretendard: 한국어 UI에 최적화된 무료 오픈소스 폰트 (토스 등 다수 서비스가 사용) -->
 <link rel="stylesheet" as="style" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
 <link rel="stylesheet" href="style.css" />
-
+ 
 <!-- 수식 렌더링(MathJax) -->
 <script>
   window.MathJax = {
@@ -62,13 +62,13 @@
         </button>
       </div>
     </header>
-
+ 
     <main class="page">
       <section class="hero">
         <h1>모르는 수학 문제,<br />AI 선생님에게 물어보세요</h1>
         <p class="hero-sub">학년을 고르고 문제 사진이나 PDF를 올리면 풀이 과정과 정답을 알려드려요.</p>
       </section>
-
+ 
       <div class="card">
         <!-- 1. 학년 선택 -->
         <section class="step" id="step-grade">
@@ -82,9 +82,9 @@
             <button type="button" class="grade-btn" data-grade="3">중학교<br />3학년</button>
           </div>
         </section>
-
+ 
         <div class="step-divider" aria-hidden="true"></div>
-
+ 
         <!-- 2. 문제 업로드 -->
         <section class="step" id="step-upload">
           <div class="step-head">
@@ -101,6 +101,14 @@
               </span>
               <p class="dropzone-title">사진 찍기 또는 파일 선택</p>
               <p class="dropzone-hint">이미지(JPG, PNG) 또는 PDF 파일 · 최대 8MB</p>
+              <p class="dropzone-hint dropzone-hint-paste">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M9 4h6a1 1 0 0 1 1 1v1H8V5a1 1 0 0 1 1-1z" />
+                  <rect x="6" y="6" width="12" height="15" rx="2" />
+                  <path d="M9 12h6M9 16h4" />
+                </svg>
+                <span>화면 캡처(스크린샷)를 복사했다면 <strong>Ctrl+V</strong>(Mac: <strong>Cmd+V</strong>)로 바로 붙여넣을 수도 있어요</span>
+              </p>
             </div>
             <div class="dropzone-content" id="dropzone-preview" hidden>
               <div class="preview-media">
@@ -124,7 +132,7 @@
           </label>
           <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf" capture="environment" hidden />
         </section>
-
+ 
         <!-- 3. 실행 -->
         <section class="step step-submit">
           <button type="button" id="btn-solve" class="primary-btn" disabled>
@@ -132,13 +140,13 @@
           </button>
           <p id="error-message" class="error-message" hidden></p>
         </section>
-
+ 
         <!-- 로딩 -->
         <section id="loading" class="loading" hidden>
           <div class="loading-bar"><div class="loading-bar-fill"></div></div>
           <p>AI 선생님이 문제를 분석하고 있어요&hellip; (최대 30초 정도 걸릴 수 있어요)</p>
         </section>
-
+ 
         <!-- 결과 -->
         <section id="result-section" class="result-section" hidden>
           <div class="result-head">
@@ -158,7 +166,7 @@
             <span>신고해주신 내용을 반영해서 AI가 다시 확인한 풀이예요.</span>
           </p>
           <div id="result-content" class="result-content"></div>
-
+ 
           <!-- 오답 신고 -->
           <div id="report-block" class="report-block">
             <button type="button" id="btn-report-toggle" class="report-toggle">
@@ -177,17 +185,18 @@
             </div>
             <p id="report-status" class="report-status" hidden></p>
           </div>
-
+ 
           <button type="button" id="btn-reset" class="secondary-btn">다른 문제 풀어보기</button>
         </section>
       </div>
     </main>
-
+ 
     <footer class="app-footer">
       <p>업로드한 문제 사진/PDF는 풀이를 위해서만 AI(Gemini)로 전송되며 별도로 저장되지 않습니다. &ldquo;이 풀이가 틀린 것 같아요&rdquo;로 신고할 경우, 남겨주신 코멘트와 AI의 풀이 텍스트(사진 제외)만 검토를 위해 저장될 수 있습니다. 인물 사진이나 개인정보가 함께 찍히지 않도록 주의해주세요.</p>
     </footer>
   </div>
-
+ 
   <script defer src="script.js"></script>
 </body>
 </html>
+ 
